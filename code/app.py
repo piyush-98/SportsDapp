@@ -15,35 +15,79 @@ from keras.models import model_from_json
 from anago.layers import CRF
 import anago
 import pyrebase
-
+import random
 class asknplay:
-    def Q_generation(self):
-        quiz={}
-        def q_rand():
-            keywords=['How','many','will','take','give','match']
+    def Q_generation(self,mid):
+            data=self.match_info(mid)
+            team1_squad=data['team1']['squad_bench']
+            team2_squad=data['team2']['squad_bench']
+            q_arr=[{"que":"Who will win","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will win the toss","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will hit more boundaries","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will hit more sixes","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]}]
+            for i in (data["players"]):
 
-        data=livematches(self)
+
+                if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                    
+                        q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":2,"options":-1})
+                else:
+                    q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":2,"options":-1})
+            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":1,"options":})
+            return q_arr
+    def Q_rand(self,mid):
+        q_arr=self.Q_generation(mid)
+        l=len(q_arr)
+        r=random.randint(0, l-1)
+        return (q_arr[r]["que"],q_arr[r]["type"],q_arr[r]["options"])
+
+    def quiz_gen(self): 
+        #firebase=firebase.FirebaseApplication("https://geographicindicationspl.firebaseio.com/")
+
+        config = {
+              "apiKey": "apiKey",
+              "authDomain":"geographicindicationspl.firebaseapp.com" ,
+              "databaseURL": "https://geographicindicationspl.firebaseio.com/",
+              "storageBucket":"geographicindicationspl.appspot.com/",
+              #"serviceAccount": "path/to/serviceAccountCredentials.json"
+            }
+
+        firebase = pyrebase.initialize_app(config)
+            #storage.child("example.jpeg").put("thumbDiv.jpeg")
+        db = firebase.database()
+            #db.child("users").set({1:"example.jpeg"})
+        users = db.child("Questions/CRICKET").get()
+        u="Questions/"
+
+        dlink=users.val() 
+        quiz={}             
+        data=self.livematches()
         for k in data["matches"]:
+            quiz={}
             if k['header']['state']=='preview':
                 mid=k['match_id']
                 quiz["match_id"]=mid
                 quiz["curparticipation"]="1"
                 quiz["minq"]="12"
                 quiz["pfee"]="10"
-                quiz["q_array"]=[]
+                quiz["Rewardsystem"]="1"
+                quiz["totalq"]="30"
+                quiz["totalwinning"]="10"
+                quiz["q_array"]={}
                 for i in range(21):
                     quiz["q_array"][str(i)]={}
-                    que,q_type,options=q_rand()
+                    que,q_type,options=self.Q_rand(mid)
                     quiz["q_array"][str(i)]["content"]=que
                     quiz["q_array"][str(i)]["type"]=q_type
-                    print(options)
                     if options!=-1:
                         quiz["q_array"][str(i)]["options"]={}
                         for j in range(len(options)):
                             quiz["q_array"][str(i)]["options"][str(j)]=options[j]
                     else:
                         quiz["q_array"][str(i)]["options"]=""
-                    
+                quiz=json.dumps(quiz)
+                db.child(u).child("CRICKET").update({mid:quiz})
+                print("done")    
         return quiz
                 
               
@@ -641,7 +685,7 @@ def main():
     while(True):
         time.sleep(10)
         a=asknplay()
-        firebase=firebase.FirebaseApplication("https://geographicindicationspl.firebaseio.com/")
+        #firebase=firebase.FirebaseApplication("https://geographicindicationspl.firebaseio.com/")
 
         config = {
               "apiKey": "apiKey",
@@ -697,6 +741,6 @@ def main():
             else:
                 continue
 
-
 a=asknplay()
-a.Q_analsys("How many runs will Virat score","11")
+data=a.quiz_gen()
+print(data)
