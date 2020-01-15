@@ -17,26 +17,54 @@ import anago
 import pyrebase
 import random
 class asknplay:
+    ls=[]
     def Q_generation(self,mid):
+            c=-1
+            team1_squad_batsmen=[]
+            team1_squad_bowlers=[]
+            team2_squad_batsmen=[]
+            team2_squad_bowlers=[]
             data=self.match_info(mid)
-            team1_squad=data['team1']['squad_bench']
-            team2_squad=data['team2']['squad_bench']
-            q_arr=[{"que":"Who will win","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will win the toss","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will hit more boundaries","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will hit more sixes","type":1,"options":[data["team1"]["name"],data["team2"]["name"]]}]
+            team1=data['team1']['squad_bench']
+            q_arr=[{"que":"Who will win","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will win the toss","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will hit more boundaries","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
+            {"que":"Who will hit more sixes","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]}]
+
             for i in (data["players"]):
+                c+=1
+                if(len(team1)>c):
+                    if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                        team1_squad_batsmen.append(i['f_name'])
+                    if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
+                        team1_squad_bowlers.append(i['f_name'])
+                else:
+                    if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                        team2_squad_batsmen.append(i['f_name'])
+                    if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
+                        team2_squad_bowlers.append(i['f_name'])
 
 
                 if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
                     
-                        q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":2,"options":-1})
+                        q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":"2","options":-1})
                 else:
-                    q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":2,"options":-1})
-            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":1,"options":})
-            return q_arr
-    def Q_rand(self,mid):
-        q_arr=self.Q_generation(mid)
+                    q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":"2","options":-1})
+            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
+            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
+            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
+            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
+            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
+            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
+            q_arr.append({"que":"Who will take max wickets from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_bowlers})
+            q_arr.append({"que":"Who will take max wickets from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_bowlers})
+            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
+            q_arr.append({"que":"Who will have the best economy from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_bowlers})
+            q_arr.append({"que":"Who will have the best economy from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_bowlers})
+            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
+            return(q_arr)
+
+    def Q_rand(self,q_arr):
         l=len(q_arr)
         r=random.randint(0, l-1)
         return (q_arr[r]["que"],q_arr[r]["type"],q_arr[r]["options"])
@@ -57,40 +85,42 @@ class asknplay:
         db = firebase.database()
             #db.child("users").set({1:"example.jpeg"})
         users = db.child("Questions/CRICKET").get()
-        u="Questions/"
-
-        dlink=users.val() 
-        quiz={}             
+        u="Questions/"            
         data=self.livematches()
         for k in data["matches"]:
             quiz={}
             if k['header']['state']=='preview':
                 mid=k['match_id']
-                quiz["match_id"]=mid
-                quiz["curparticipation"]="1"
-                quiz["minq"]="12"
-                quiz["pfee"]="10"
-                quiz["Rewardsystem"]="1"
-                quiz["totalq"]="30"
-                quiz["totalwinning"]="10"
-                quiz["q_array"]={}
-                for i in range(21):
-                    quiz["q_array"][str(i)]={}
-                    que,q_type,options=self.Q_rand(mid)
-                    quiz["q_array"][str(i)]["content"]=que
-                    quiz["q_array"][str(i)]["type"]=q_type
-                    if options!=-1:
-                        quiz["q_array"][str(i)]["options"]={}
-                        for j in range(len(options)):
-                            quiz["q_array"][str(i)]["options"][str(j)]=options[j]
-                    else:
-                        quiz["q_array"][str(i)]["options"]=""
-                quiz=json.dumps(quiz)
-                db.child(u).child("CRICKET").update({mid:quiz})
-                print("done")    
+                q_arr=self.Q_generation(mid)
+                for n in range(1,4):
+                    quiz={}
+                    quiz['quiz_id']=str(n)
+                    quiz["match_id"]=mid
+                    quiz["curparticipation"]="0"
+                    quiz["minq"]="12"
+                    quiz["pfee"]="10"
+                    quiz["rewardsystem"]="1"
+                    quiz["totalq"]="20"
+                    quiz["totalwinning"]="100"
+                    quiz["maxparticipation"]="10"
+                    quiz['totalwinners']="5"
+                    quiz["qtype"]="beginner"
+                    quiz['creator']='auto'
+                    quiz["q_array"]=[]
+                    for i in range(21):
+                        q={}
+                        que,q_type,options=self.Q_rand(q_arr)
+                        q["content"]=que
+                        q["type"]=q_type
+                        if options!=-1:
+                            q["options"]=str(options)
+                        else:
+                            q["options"]=[]
+                        quiz["q_array"].append(q)
+                    quiz=json.dumps(quiz)
+                    db.child(u).child("CRICKET").child(mid).update({str(n):quiz}) 
+                print(quiz)        
         return quiz
-                
-              
     def Data_make(self):
         columns=['q_id', 'Team','Over', 'Bowler', 'Batsmen', 'Bow_wickets',
                'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets',
