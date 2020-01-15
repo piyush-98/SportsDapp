@@ -26,10 +26,10 @@ class asknplay:
             team2_squad_bowlers=[]
             data=self.match_info(mid)
             team1=data['team1']['squad_bench']
-            q_arr=[{"que":"Who will win","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will win the toss","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will hit more boundaries","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]},
-            {"que":"Who will hit more sixes","type":"1","options":[data["team1"]["name"],data["team2"]["name"]]}]
+            q_arr=[{"que":"Who will win","type":"1","options":json.dumps([data["team1"]["name"],data["team2"]["name"]])},
+            {"que":"Who will win the toss","type":"1","options":json.dumps([data["team1"]["name"],data["team2"]["name"]])},
+            {"que":"Who will hit more boundaries","type":"1","options":json.dumps([data["team1"]["name"],data["team2"]["name"]])},
+            {"que":"Who will hit more sixes","type":"1","options":json.dumps([data["team1"]["name"],data["team2"]["name"]])}]
 
             for i in (data["players"]):
                 c+=1
@@ -50,18 +50,18 @@ class asknplay:
                         q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":"2","options":-1})
                 else:
                     q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":"2","options":-1})
-            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
-            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
-            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
-            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
-            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
-            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
-            q_arr.append({"que":"Who will take max wickets from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_bowlers})
-            q_arr.append({"que":"Who will take max wickets from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_bowlers})
-            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_batsmen})
-            q_arr.append({"que":"Who will have the best economy from {}".format(data["team1"]["name"]),"type":"1","options":team1_squad_bowlers})
-            q_arr.append({"que":"Who will have the best economy from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_bowlers})
-            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team2"]["name"]),"type":"1","options":team2_squad_batsmen})
+            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
+            q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
+            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
+            q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
+            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
+            q_arr.append({"que":"Who's strike rate will be best from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
+            q_arr.append({"que":"Who will take max wickets from {}".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_bowlers)})
+            q_arr.append({"que":"Who will take max wickets from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_bowlers)})
+            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
+            q_arr.append({"que":"Who will have the best economy from {}".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_bowlers)})
+            q_arr.append({"que":"Who will have the best economy from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_bowlers)})
+            q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
             return(q_arr)
 
     def Q_rand(self,q_arr):
