@@ -1,5 +1,10 @@
 import json
-s=["a","b"]
-json.dumps(s)
+import requests
 
-print(s[0])
+def scorecard(mid):
+        url="http://mapps.cricbuzz.com/cbzios/match/{}/scorecard.json".format(mid)
+        res=(requests.get(url))
+        data=(json.loads(res.text))
+        return(data)
+data=scorecard("22773")
+print(data["Innings"][1])

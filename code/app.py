@@ -453,21 +453,16 @@ class asknplay:
     def Batsman_over(self,id,over,runs_prev,mid):
         while(True):
             data=self.scorecard(mid)
-            print("xx")
-            print(float(data["Innings"][0]['ovr']))
-            print(float(over)-1)
             ls=[]
             for j in (data["Innings"][0]['batsmen']):
                 ls.append(j['id'])
             if id in ls:
-                    print("mm")
                     ind=ls.index(id)
 
                     def Batsman_found(ind,over,runs_prev):
                         while(True):
-                            data=scorecard(mid)
+                            data=self.scorecard(mid)
                             if float(data["Innings"][0]['ovr'])==float(over)-1:
-                                print("oo")
                                 if data["Innings"][0]['batsmen'][ind]['out_desc']!="batting":
                                     return -1
                                 else:
@@ -485,7 +480,6 @@ class asknplay:
             else:
                 time.sleep(5)
     def Team_run_over(self,over,runs_prev,mid):
-        print("jjj")
         while(True):
             data=self.scorecard(mid)
             if float(data["Innings"][0]['ovr'])==float(over)-1:
@@ -508,19 +502,23 @@ class asknplay:
 
             return "Not applicable"
     def Team_run(self,mid,max_ovr):
-        data=self.scorecard()
+        data=self.scorecard(mid)
         if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
             runs=data["Innings"][0]['score']
             return runs
         else:
             return "Not applicable"
     def Team_wickets(self,mid,max_ovr):
-        data=self.scorecard()
+        data=self.scorecard(mid)
         if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
             wickets=data["Innings"][0]['wkts']
             return wickets
         else:
             return "Not applicable"
+    def Team_century(self,mid,max_ovr):
+        data=self.scorecard(mid)
+        if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+
 
 
 
@@ -533,7 +531,11 @@ class asknplay:
         ls=[]
         index=0
         df=self.Data_app()
-        col=
+        col=['q_id', 'Team','Over', 'Bowler', 'Batsmen', 'Bow_wickets',
+               'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets','Team_bat','Team_bowl',
+               'Boundaries', 'Sixes','century','strike','economy', 'Valid Before']
+        
+
         response=df.iloc[index].isnull()
         for i in range(len(response)):
             if(response[i]==False):
@@ -550,24 +552,58 @@ class asknplay:
                         return "Not applicable"
                 elif 9 in ls:
                     if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
-                        result=Team_w(mid)
+                        result=self.Team_w(mid)
                         return result
                     else:
                         return "Not applicable"
                 elif 10 in ls:
                     max_ovr=self.max_over_gen(mid)
                     if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
-                        result=Team_run(mid,max_ovr)
+                        result=self.Team_run(mid,max_ovr)
                         return result
                     else:
                         return "Not applicable"
                 elif 11 in ls:
                     max_ovr=self.max_over_gen(mid)
                     if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
-                        result=Team_wickets(mid,max_ovr)
+                        result=self.Team_wickets(mid,max_ovr)
                         return result
                     else:
                         return "Not applicable"
+                elif 12 in ls:
+                    max_ovr=self.max_over_gen(mid)
+                    if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+                        result=self.Team_bat(mid,max_ovr)
+                    else:
+                        return 'Not applicable'
+
+                elif 13 in ls:
+                    max_ovr=self.max_over_gen(mid)
+                    if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+                        result=self.Team_bowl(mid,max_ovr)
+                    else:
+                        return 'Not applicable'
+
+                elif 16 in ls:
+                    max_ovr=self.max_over_gen(mid)
+                    if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+                        result=self.Team_century(mid,max_ovr)
+                    else:
+                        return 'Not applicable'
+    
+                elif 17 in ls:
+                    max_ovr=self.max_over_gen(mid)
+                    if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+                        result=self.Team_strike(mid,max_ovr)
+                    else:
+                        return 'Not applicable'
+
+                elif 18 in ls:
+                    max_ovr=self.max_over_gen(mid)
+                    if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+                        result=self.Team_eco(mid,max_ovr)
+                    else:
+                        return 'Not applicable'
 
             elif i==2:
                 print("here") ##over
