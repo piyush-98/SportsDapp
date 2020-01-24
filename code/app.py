@@ -532,7 +532,6 @@ class asknplay:
     def Team_strike(self,mid,max_ovr,team):
         data=self.scorecard(mid)
         max_strike=0.0
-        result=''
         if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
             if data['Innings'][0]['bat_team_name']==team:
                 index=0
@@ -546,6 +545,22 @@ class asknplay:
             return result
         else:
             return 'Not applicable'
+    def Team_eco(self,mid,max_ovr,team):
+        data=self.scorecard(mid)
+        min_eco=100.0
+        if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+            if data['Innings'][0]['bat_team_name']==team:
+                index=0
+            else:
+                index=1
+            for j in data['Innings'][index]['bowlers']:
+                    if((j['r']/j['o']))<min_eco:
+                        min_eco=((j['r']/j['o']))
+                        result=j['id']
+            return result
+        else:
+            return 'Not applicable'
+
     def decision(self,mid,q_id,db,dlink):
         data=self.scorecard(mid)
         if data["state"]=="preview":
@@ -556,8 +571,6 @@ class asknplay:
         col=['q_id', 'Team','Over', 'Bowler', 'Batsmen', 'Bow_wickets',
                'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets','Team_bat','Team_bowl',
                'Boundaries', 'Sixes','century','strike','economy', 'Valid Before']
-        
-
         response=df.iloc[index].isnull()
         for i in range(len(response)):
             if(response[i]==False):
