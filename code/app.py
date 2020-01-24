@@ -123,8 +123,8 @@ class asknplay:
         return quiz
     def Data_make(self):
         columns=['q_id', 'Team','Over', 'Bowler', 'Batsmen', 'Bow_wickets',
-               'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets',
-               'Boundaries', 'Sixes', 'Valid Before']
+               'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets','Team_bat','Team_bowl',
+               'Boundaries', 'Sixes','century','strike','economy', 'Valid Before']
         todays_date = datetime.datetime.now().date()
         index = pd.date_range(todays_date-datetime.timedelta(10), periods=1, freq='D')
         df=pd.DataFrame(columns=columns,index=index)
@@ -192,18 +192,28 @@ class asknplay:
             if "win" in ls2:
               df.iloc[c]["Team_win"]=1
               df.iloc[c]["Valid Before"]="first Innings"
+            elif 'century' in ls2:
+                df.iloc[c]["century"]=1
             elif "wickets" in ls2 or "wicket" in ls2:
               df.iloc[c]["Team_wickets"]=1
               df.iloc[c]["Valid Before"]=20
+              if "max" in ls2:
+                  df.iloc[c]["Team_bowl"]=1
             elif "runs" in ls2 or "run" in ls2:
               df.iloc[c]["Team_run"]=1
               df.iloc[c]["Valid Before"]=20
+              if "max" in ls2:
+                  df.iloc[c]["Team_bat"]=1
             elif "boundaries" in ls2:
              df.iloc[c]["Boundaries"]=1
              df.iloc[c]["Valid Before"]=20
             elif "sixes" in ls2:
               df.iloc[c]["Sixes"]=1
               df.iloc[c]["Valid Before"]=20
+            elif "stike" in ls2:
+                df.iloc[c]["strike"]=1
+            elif "economy" in ls2:
+                df.iloc[c]["economy"]=1
           elif (data['entities'][0]['type'])=='PER':
               if "wickets" in ls2 or "wicket" in ls2:
                 df.iloc[c]["Bowler"]=(data['entities'][0]['text'])
@@ -523,9 +533,7 @@ class asknplay:
         ls=[]
         index=0
         df=self.Data_app()
-        col=['q_id', 'Team','Over', 'Bowler', 'Batsmen', 'Bow_wickets',
-               'Maiden', 'Wide', 'Noball', 'Team_win', 'Team_run', 'Team_wickets',
-               'Boundaries', 'Sixes', 'Valid Before']
+        col=
         response=df.iloc[index].isnull()
         for i in range(len(response)):
             if(response[i]==False):
