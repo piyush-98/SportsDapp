@@ -560,6 +560,37 @@ class asknplay:
             return result
         else:
             return 'Not applicable'
+    def Team_bat(self,mid,max_ovr,team):
+        data=self.scorecard(mid)
+        if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+            max_runs=0
+            if data['Innings'][0]['bat_team_name']==team:
+                index=0
+            else:
+                index=1
+            for j in data['Innings'][index]['batsmen']:
+                    if j['r']>max_runs:
+                        max_runs=j['r']
+                        result=j['id']
+            return result
+        else:
+            return 'Not applicable'
+
+    def Team_bowl(self,mid,max_ovr,team):
+        data=self.scorecard(mid)
+        if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+            max_wickets=0
+            if data['Innings'][0]['bat_team_name']==team:
+                index=0
+            else:
+                index=1
+            for j in data['Innings'][index]['bowlers']:
+                    if j['w']>max_wickets:
+                        max_wickets=j['w']
+                        result=j['id']
+            return result
+        else:
+            return 'Not applicable'
 
     def decision(self,mid,q_id,db,dlink):
         data=self.scorecard(mid)
