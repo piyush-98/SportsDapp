@@ -515,15 +515,37 @@ class asknplay:
             return wickets
         else:
             return "Not applicable"
-    def Team_century(self,mid,max_ovr):
+    def Team_century(self,mid,max_ovr,team):
         data=self.scorecard(mid)
+        result=[]
         if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
-
-
-
-
-
-
+            if data['Innings'][0]['bat_team_name']==team:
+                index=0
+            else:
+                index=1
+            for j in data['Innings'][index]['batsmen']:
+                if j['r']>='100':
+                    result.append(j['id'])
+            return result
+        else:
+            return 'Not applicable'
+    def Team_strike(self,mid,max_ovr,team):
+        data=self.scorecard(mid)
+        max_strike=0.0
+        result=''
+        if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+            if data['Innings'][0]['bat_team_name']==team:
+                index=0
+            else:
+                index=1
+            for j in data['Innings'][index]['batsmen']:
+                if j['r']>'15':
+                    if((j['r']/j['b'])*100)>max_strike:
+                        max_strike=((j['r']/j['b'])*100)
+                        result=j['id']
+            return result
+        else:
+            return 'Not applicable'
     def decision(self,mid,q_id,db,dlink):
         data=self.scorecard(mid)
         if data["state"]=="preview":
@@ -572,8 +594,9 @@ class asknplay:
                         return "Not applicable"
                 elif 12 in ls:
                     max_ovr=self.max_over_gen(mid)
+                    team=df.iloc[index]['Team']
                     if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
-                        result=self.Team_bat(mid,max_ovr)
+                        result=self.Team_bat(mid,max_ovr,team)
                     else:
                         return 'Not applicable'
 
@@ -587,6 +610,7 @@ class asknplay:
                 elif 16 in ls:
                     max_ovr=self.max_over_gen(mid)
                     if float(data["Innings"][0]['ovr'])==float(max_ovr) or data['state']=="complete":
+
                         result=self.Team_century(mid,max_ovr)
                     else:
                         return 'Not applicable'

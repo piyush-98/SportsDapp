@@ -7,4 +7,6 @@ def scorecard(mid):
         data=(json.loads(res.text))
         return(data)
 data=scorecard("22773")
-print(data["Innings"][1])
+for i in data["Innings"]:
+    for j in (i['batsmen']):
+        print(j['r'])
