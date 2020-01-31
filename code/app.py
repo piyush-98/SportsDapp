@@ -96,19 +96,22 @@ class asknplay:
                     quiz["curparticipation"]="0"
                     quiz['q_id']=str(n)
                     quiz["match_id"]=mid
-                    quiz["content"]=q_arr[n]['que']
                     quiz['pfee']='10'
                     quiz['rewardsystem']='1'
                     quiz['creator']='auto'
 
                     if q_arr[n]['type']=='1':
+                        quiz["content"]=q_arr[n]['que']
                         quiz['type']='1'
                         quiz["options"]=q_arr[n]['options']
+                        continue
                     else:
+                        quiz["content"]=q_arr[n]['que']
                         quiz["options"]=[]
                         quiz['type']='2'
                     quiz=json.dumps(quiz)
                     db.child(u).child("CRICKET").child(mid).update({str(n):quiz}) 
+                    db.child(u).child("PARTICIPATION").child(mid).update({str(n):"0"})
                 print(quiz)        
         return quiz
     def Data_make(self):
