@@ -32,24 +32,27 @@ class asknplay:
             {"que":"Who will hit more sixes","type":"1","options":json.dumps([data["team1"]["name"],data["team2"]["name"]])}]
 
             for i in (data["players"]):
-                c+=1
-                if(len(team1)>c):
-                    if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
-                        team1_squad_batsmen.append(i['f_name'])
-                    if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
-                        team1_squad_bowlers.append(i['f_name'])
-                else:
-                    if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
-                        team2_squad_batsmen.append(i['f_name'])
-                    if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
-                        team2_squad_bowlers.append(i['f_name'])
+                try:
+                    c+=1
+                    if(len(team1)>c):
+                        if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                            team1_squad_batsmen.append(i['f_name'])
+                        if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
+                            team1_squad_bowlers.append(i['f_name'])
+                    else:
+                        if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                            team2_squad_batsmen.append(i['f_name'])
+                        if i["speciality"]=='Bowler' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder':
+                            team2_squad_bowlers.append(i['f_name'])
 
 
-                if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
-                    
-                        q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":"2","options":-1})
-                else:
-                    q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":"2","options":-1})
+                    if i["speciality"]=='Batsman' or i["speciality"]=='Batting Allrounder' or i["speciality"]=='Bowling Allrounder' or i["speciality"]=='WK-Batsman':
+                        
+                            q_arr.append({"que":"How many runs will {} score?".format(i["f_name"]),"type":"2","options":-1})
+                    else:
+                        q_arr.append({"que":"How many wickets will {} take?".format(i["f_name"]),"type":"2","options":-1})
+                except KeyError:
+                    continue
             q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
             q_arr.append({"que":"Who will hit a century in the match from {}?".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
             q_arr.append({"que":"Who will score max runs in the match from {}?".format(data["team1"]["name"]),"type":"1","options":json.dumps(team1_squad_batsmen)})
@@ -63,11 +66,6 @@ class asknplay:
             q_arr.append({"que":"Who will have the best economy from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_bowlers)})
             q_arr.append({"que":"Who will have the best strike rate from {}".format(data["team2"]["name"]),"type":"1","options":json.dumps(team2_squad_batsmen)})
             return(q_arr)
-
-    def Q_rand(self,q_arr):
-        l=len(q_arr)
-        r=random.randint(0, l-1)
-        return (q_arr[r]["que"],q_arr[r]["type"],q_arr[r]["options"])
 
     def quiz_gen(self): 
         #firebase=firebase.FirebaseApplication("https://geographicindicationspl.firebaseio.com/")
@@ -88,35 +86,20 @@ class asknplay:
         u="Questions/"            
         data=self.livematches()
         for k in data["matches"]:
-            quiz={}
             if k['header']['state']=='preview':
                 mid=k['match_id']
                 q_arr=self.Q_generation(mid)
-                for n in range(1,4):
+                length=len(q_arr)
+                for n in range(0,length):
                     quiz={}
-                    quiz['quiz_id']=str(n)
+                    quiz['que_id']=str(n+1)
                     quiz["match_id"]=mid
-                    quiz["curparticipation"]="0"
-                    quiz["minq"]="12"
-                    quiz["pfee"]="10"
-                    quiz["rewardsystem"]="1"
-                    quiz["totalq"]="20"
-                    quiz["totalwinning"]="100"
-                    quiz["maxparticipation"]="10"
-                    quiz['totalwinners']="5"
-                    quiz["qtype"]="beginner"
-                    quiz['creator']='auto'
-                    quiz["q_array"]=[]
-                    for i in range(21):
-                        q={}
-                        que,q_type,options=self.Q_rand(q_arr)
-                        q["content"]=que
-                        q["type"]=q_type
-                        if options!=-1:
-                            q["options"]=str(options)
-                        else:
-                            q["options"]=[]
-                        quiz["q_array"].append(q)
+                    quiz["totalq"]=str(n)
+                    quiz["que"]=q_arr[n]['que']
+                    if q_arr[n]['type']=='1':
+                        quiz["options"]=q_arr[n]['options']
+                    else:
+                        quiz["options"]=[]
                     quiz=json.dumps(quiz)
                     db.child(u).child("CRICKET").child(mid).update({str(n):quiz}) 
                 print(quiz)        
@@ -885,4 +868,3 @@ def main():
 
 a=asknplay()
 data=a.quiz_gen()
-print(data)
